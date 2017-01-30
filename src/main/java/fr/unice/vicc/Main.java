@@ -111,6 +111,8 @@ public class Main {
         }
         System.err.println("hop");
         System.out.println(revenues);
+
+        System.out.println("Fini !!");
     }
 
     private static void prepareLogging(String d) throws FileNotFoundException {
