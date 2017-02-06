@@ -71,3 +71,4 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
         return hoster.get(vmId);//Ne marche pas
     }
 }
+
