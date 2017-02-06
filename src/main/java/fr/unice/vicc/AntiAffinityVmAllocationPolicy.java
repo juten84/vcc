@@ -43,11 +43,17 @@ public class AntiAffinityVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public Host getHost(Vm vm) {
-        return null;
+        Host host = hoster.get(vm);
+        return host;
     }
 
     @Override
-    public Host getHost(int i, int i1) {
+    public Host getHost(int vmId, int userId) {
+        for (Vm vm : hoster.keySet()) {
+            if (vm.getId() == vmId && vm.getUserId() == userId) {
+                return getHost(vm);
+            }
+        }
         return null;
     }
 }
