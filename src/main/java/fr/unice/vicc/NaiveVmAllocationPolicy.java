@@ -30,11 +30,21 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public List<Map<String, Object>> optimizeAllocation(List<? extends Vm> list) {
+
         return null;
     }
 
     @Override
-    public boolean allocateHostForVm(Vm vm) {        
+    public boolean allocateHostForVm(Vm vm)
+    {
+        //First fit algorithm, run on the first suitable node
+        for (Host h : getHostList()) {
+            if (h.vmCreate(vm)) {
+                //track the host
+                hoster.put(vm, h);
+                return true;
+            }
+        }
         return false;
     }
 
@@ -45,15 +55,17 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public void deallocateHostForVm(Vm vm) {
+        hoster.get(vm).vmDestroy(vm);
     }
 
     @Override
     public Host getHost(Vm vm) {
-        return null;
+        return this.hoster.get(vm);
     }
 
     @Override
     public Host getHost(int vmId, int userId) {
-        return null;
+        return this.hoster.get(Vm.getUid(userId, vmId));
+        //?
     }
 }
