@@ -61,7 +61,6 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
         getHost(vm).vmDestroy(vm);
     }
 
-
     @Override
     public Host getHost(Vm vm) {
         return hoster.get(vm);
