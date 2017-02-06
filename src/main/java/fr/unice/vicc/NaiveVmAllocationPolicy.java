@@ -37,7 +37,7 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
     @Override
     public boolean allocateHostForVm(Vm vm) {
         for (Host host : getHostList()) {
-            if (allocateHostForVm(vm, host) == true)
+            if (allocateHostForVm(vm, host))
                 return true;
         }
         return false;
@@ -45,7 +45,7 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public boolean allocateHostForVm(Vm vm, Host host) {
-        if (host.vmCreate(vm) == true) {
+        if (host.vmCreate(vm)) {
             hoster.put(vm, host);
             return true;
         } else
