@@ -1,25 +1,26 @@
 package fr.unice.vicc;
 
-import org.cloudbus.cloudsim.Host;
-import org.cloudbus.cloudsim.Vm;
-import org.cloudbus.cloudsim.VmAllocationPolicy;
-import org.cloudbus.cloudsim.power.PowerHost;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.cloudbus.cloudsim.Host;
+import org.cloudbus.cloudsim.Vm;
+import org.cloudbus.cloudsim.VmAllocationPolicy;
 
 /**
  * Created by fhermeni2 on 16/11/2015.
  */
 public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
 
-    /** The map to track the server that host each running VM. */
-    private Map<Vm,Host> hoster;
+    /**
+     * The map to track the server that host each running VM.
+     */
+    private Map<Vm, Host> hoster;
 
     public NaiveVmAllocationPolicy(List<? extends Host> list) {
         super(list);
-        hoster =new HashMap<>();
+        setHostList(list);
     }
 
     @Override
@@ -30,42 +31,46 @@ public class NaiveVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public List<Map<String, Object>> optimizeAllocation(List<? extends Vm> list) {
-
         return null;
     }
 
     @Override
-    public boolean allocateHostForVm(Vm vm)
-    {
-        //First fit algorithm, run on the first suitable node
-        for (Host h : getHostList()) {
-            if (h.vmCreate(vm)) {
-                //track the host
-                hoster.put(vm, h);
+    public boolean allocateHostForVm(Vm vm) {
+        for (Host host : getHostList()) {
+            if (allocateHostForVm(vm, host))
                 return true;
-            }
         }
         return false;
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm, Host host) {
-        return false;
+        if (host.vmCreate(vm)) {
+            hoster.put(vm, host);
+            return true;
+        } else
+            return false;
     }
 
     @Override
     public void deallocateHostForVm(Vm vm) {
-        hoster.get(vm).vmDestroy(vm);
+        Host host = getHost(vm);
+        host.vmDestroy(vm);
     }
 
     @Override
     public Host getHost(Vm vm) {
-        return this.hoster.get(vm);
+        Host host = hoster.get(vm);
+        return host;
     }
 
     @Override
     public Host getHost(int vmId, int userId) {
-        return this.hoster.get(Vm.getUid(userId, vmId));
-        //?
+        for (Vm vm : hoster.keySet()) {
+            if (vm.getId() == vmId && vm.getUserId() == userId) {
+                return getHost(vm);
+            }
+        }
+        return null;
     }
 }
