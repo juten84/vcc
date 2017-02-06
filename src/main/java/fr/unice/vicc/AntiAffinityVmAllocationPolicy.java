@@ -41,6 +41,8 @@ public class AntiAffinityVmAllocationPolicy extends VmAllocationPolicy {
 
     }
 
+
+
     @Override
     public Host getHost(Vm vm) {
         return null;
