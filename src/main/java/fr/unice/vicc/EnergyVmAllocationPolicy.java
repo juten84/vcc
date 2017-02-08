@@ -4,46 +4,49 @@ import org.cloudbus.cloudsim.Host;
 import org.cloudbus.cloudsim.Vm;
 import org.cloudbus.cloudsim.VmAllocationPolicy;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * Created by Justin on 06/02/2017.
+ * Created by Justin on 08/02/2017.
  */
-public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
+public class EnergyVmAllocationPolicy extends VmAllocationPolicy {
 
     private Map<Vm, Host> hoster;
-    private Map<Integer, List<Host>> affinityMap;
 
-    public FaultToleranceVmAllocationPolicy(List<? extends Host> list) {
+    public EnergyVmAllocationPolicy(List<? extends Host> list) {
+
         super(list);
+        hoster = new HashMap<>();
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
-        //TODO
-        int vmID = vm.getId();
-        if(vmID%10==0)
-        {
-            //check all eligible hosts for the class
-            for (Host h : affinityMap.get(vmID))
-            {
-
+        Collections.sort(getHostList(), new Comparator<Host>() {
+            @Override
+            public int compare(Host h1, Host h2) {
+                int i =  (int) (h1.getAvailableMips() - h2.getAvailableMips());
+                return i;
             }
-        }
-        else
-        {
+        });
 
+
+        for (Host h : getHostList()) {
+            if (h.vmCreate(vm)) {
+                //track the host
+                hoster.put(vm, h);
+                return true;
+            }
         }
         return false;
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm, Host host) {
-     //Todo
-
+        if (host.vmCreate(vm)) {
+            //the host is appropriate, we track it
+            hoster.put(vm, host);
+            return true;
+        }
         return false;
     }
 
@@ -54,17 +57,12 @@ public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public void deallocateHostForVm(Vm vm) {
-
         Host host = getHost(vm);
         host.vmDestroy(vm);
     }
 
-
-
     @Override
     public Host getHost(Vm vm) {
-
-        affinityMap.get(vm.getId()/100).add(vm.getHost());
         Host host = hoster.get(vm);
         return host;
     }
