@@ -2,7 +2,10 @@
 
 ## The team
 
-- Foo bar: email1
-- bar bar: email2
+Justin Vailhere : justin.vailhere@gmail.com
+Benoit Arliaud : arliaud.benoit@gmail.com
+Jiawen Fan : jiawen.gmd@gmail.com
 
 ## Comments
+
+The report is on the pdf file.

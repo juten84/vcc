@@ -15,37 +15,48 @@ import java.util.Map;
 public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
 
     private Map<Vm, Host> hoster;
-    private Map<Integer, List<Host>> affinityMap;
 
     public FaultToleranceVmAllocationPolicy(List<? extends Host> list) {
         super(list);
+        hoster = new HashMap<>();
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
-        //TODO
-        int vmID = vm.getId();
-        if(vmID%10==0)
-        {
-            //check all eligible hosts for the class
-            for (Host h : affinityMap.get(vmID))
-            {
+        int vmId = vm.getId();
+        boolean importantVm = false;
+
+        if (vmId % 10 == 0) {
+            importantVm = true;
+        }
+
+        for (Host host : getHostList()) {
+            if (importantVm && host.isSuitableForVm(vm) && host.vmCreate(vm)) {
+                hoster.put(vm, host);
+                return true;
 
             }
-        }
-        else
-        {
+            if (!importantVm && host.vmCreate(vm)){
+                hoster.put(vm, host);
+                return true;
+            }
 
         }
+
         return false;
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm, Host host) {
-     //Todo
 
+        //Check if it's not one VM we should be carreful with
+        if (vm.getId() % 10 != 0 && host.vmCreate(vm)) {
+            hoster.put(vm, host);
+            return true;
+        }
         return false;
     }
+
 
     @Override
     public List<Map<String, Object>> optimizeAllocation(List<? extends Vm> list) {
@@ -60,11 +71,8 @@ public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
     }
 
 
-
     @Override
     public Host getHost(Vm vm) {
-
-        affinityMap.get(vm.getId()/100).add(vm.getHost());
         Host host = hoster.get(vm);
         return host;
     }

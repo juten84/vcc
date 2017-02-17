@@ -19,15 +19,14 @@ public class NextFitVmAllocationPolicy extends VmAllocationPolicy {
     public NextFitVmAllocationPolicy(List<? extends Host> list) {
         super(list);
         hoster = new HashMap<>();
-        i=0;
+        i = 0;
     }
-
 
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
 
-       while (i<getHostList().size()) {
+        while (i < getHostList().size()) {
             if (getHostList().get(i).vmCreate(vm)) {
                 hoster.put(vm, getHostList().get(i));
                 return true;
@@ -49,8 +48,6 @@ public class NextFitVmAllocationPolicy extends VmAllocationPolicy {
     }
 
 
-
-
     @Override
     public List<Map<String, Object>> optimizeAllocation(List<? extends Vm> list) {
         return null;
@@ -62,7 +59,6 @@ public class NextFitVmAllocationPolicy extends VmAllocationPolicy {
         Host host = getHost(vm);
         host.vmDestroy(vm);
     }
-
 
 
     @Override

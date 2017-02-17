@@ -21,12 +21,9 @@ public class EnergyVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
-        Collections.sort(getHostList(), new Comparator<Host>() {
-            @Override
-            public int compare(Host h1, Host h2) {
-                int i =  (int) (h1.getAvailableMips() - h2.getAvailableMips());
-                return i;
-            }
+        Collections.sort(getHostList(), (h1, h2) -> {
+            int i =  (int) (h1.getAvailableMips() - h2.getAvailableMips());
+            return i;
         });
 
 

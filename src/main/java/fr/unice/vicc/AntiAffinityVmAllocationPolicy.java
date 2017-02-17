@@ -20,7 +20,7 @@ public class AntiAffinityVmAllocationPolicy extends VmAllocationPolicy {
     public AntiAffinityVmAllocationPolicy(List<? extends Host> list) {
         super(list);
         hoster = new HashMap<>();
-        affinityMap = new HashMap<Integer, List<Host>>();
+        affinityMap = new HashMap<>();
     }
 
     @Override
@@ -28,7 +28,7 @@ public class AntiAffinityVmAllocationPolicy extends VmAllocationPolicy {
         int vmID = vm.getId();
         if(affinityMap.containsKey(vmID/100))
         {
-            //check all eligible hosts for the class
+
             for (Host h : affinityMap.get(vmID/100))
             {
                 if (h.vmCreate(vm))
@@ -45,10 +45,10 @@ public class AntiAffinityVmAllocationPolicy extends VmAllocationPolicy {
             {
                 if (h.vmCreate(vm))
                 {
-                    List<Host> eligibleHosts = new ArrayList<Host>();
-                    eligibleHosts.addAll(getHostList());
-                    eligibleHosts.remove(h);
-                    affinityMap.put(vmID/100, eligibleHosts);
+                    List<Host> possibleHosts = new ArrayList<>();
+                    possibleHosts.addAll(getHostList());
+                    possibleHosts.remove(h);
+                    affinityMap.put(vmID/100, possibleHosts);
                     hoster.put(vm, h);
                     return true;
                 }
@@ -74,10 +74,10 @@ public class AntiAffinityVmAllocationPolicy extends VmAllocationPolicy {
         {
             if (host.vmCreate(vm))
             {
-                List<Host> eligibleHosts = new ArrayList<Host>();
-                eligibleHosts.addAll(getHostList());
-                eligibleHosts.remove(host);
-                affinityMap.put(vmClass, eligibleHosts);
+                List<Host> possibleHosts = new ArrayList<>();
+                possibleHosts.addAll(getHostList());
+                possibleHosts.remove(host);
+                affinityMap.put(vmClass, possibleHosts);
                 hoster.put(vm, host);
                 return true;
             }

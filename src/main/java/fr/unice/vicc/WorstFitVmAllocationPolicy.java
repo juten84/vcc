@@ -22,8 +22,8 @@ public class WorstFitVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
-        List<Host> hosts = getHostList();
-        hosts.sort((o1, o2) -> {
+        List<Host> hostList = getHostList();
+        hostList.sort((o1, o2) -> {
             if (o1.getAvailableMips() ==  o2.getAvailableMips()){
                 if (o1.getRam() <= o2.getRam()){
                     return 1;
@@ -38,12 +38,13 @@ public class WorstFitVmAllocationPolicy extends VmAllocationPolicy {
 
 
         });
-        Host bestHost = hosts.get(0);
-        if(!bestHost.vmCreate(vm)){
+
+        if(! hostList.get(0).vmCreate(vm)){
             System.err.println("No more place for VM");
             return false;
         }
-        hoster.put(vm, bestHost);
+
+        hoster.put(vm, hostList.get(0));
         return true;
     }
 

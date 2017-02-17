@@ -27,27 +27,22 @@ public class GreedyVmAllocationPolicy  extends VmAllocationPolicy {
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
-        Collections.sort(getHostList(), new Comparator<Host>() {
-            @Override
-            public int compare(Host h1, Host h2) {
-                return (int)(h1.getAvailableMips() - h2.getAvailableMips());
-            }
-        });
+        Collections.sort(getHostList(), (h1, h2) -> (int)(h1.getAvailableMips() - h2.getAvailableMips()));
 
 
         for (Host h : getHostList()) {
 
-            boolean suitableHost = false;
-            for(Pe processingElem : h.getPeList())
+            boolean possibleHost = false;
+            for(Pe p : h.getPeList())
             {
-                if(vm.getMips() - 500d < processingElem.getPeProvisioner().getAvailableMips())
+                if(vm.getMips() - 500d < p.getPeProvisioner().getAvailableMips())
                 {
-                    suitableHost = true;
+                    possibleHost = true;
                     break;
                 }
             }
 
-            if(suitableHost)
+            if(possibleHost)
             {
                 if (h.vmCreate(vm)) {
                     hoster.put(vm, h);
@@ -63,7 +58,6 @@ public class GreedyVmAllocationPolicy  extends VmAllocationPolicy {
     @Override
     public boolean allocateHostForVm(Vm vm, Host host) {
         if (host.vmCreate(vm)) {
-            //the host is appropriate, we track it
             hoster.put(vm, host);
             return true;
         }
