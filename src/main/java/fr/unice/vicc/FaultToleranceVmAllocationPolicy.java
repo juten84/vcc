@@ -83,6 +83,8 @@ public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
 
 
 
+
+
     @Override
     public Host getHost(Vm vm) {
         Host host = hoster.get(vm);
