@@ -126,15 +126,15 @@ This project aims at developing different VM schedulers for a given IaaS cloud. 
 The implementation and the evaluation were made over the IaaS cloud simulator CloudSim. The simulator replays a workload extracted from Emulab, on a datacenter having realistic characteristics.
 
 ##Team
-Justin Vailhere : justin.vailhere@gmail.com
-Benoit Arliaud : arliaud.benoit@gmail.com
-Jiawen Fan : jiawen.gmd@gmail.com
+Justin Vailhere : justin.vailhere@gmail.com  
+Benoit Arliaud : arliaud.benoit@gmail.com  
+Jiawen Fan : jiawen.gmd@gmail.com  
 
 ##Dev environment
-Java 8
-Maven
-IDE : Intellij IDEA
-Git
+Java 8  
+Maven  
+IDE : Intellij IDEA  
+Git  
 
 To setup our environment , we first cloned the following directory directly in IntelliJ IDEA:
 ```sh
@@ -176,10 +176,10 @@ Technical choices: We use the method vmCreate of the class Host to test if there
 Temporal complexity: o(n) where n is the number of host.
 
 ####Results
-Incomes: 12398,59 €
-Penalties: 402,16 €
-Energy: 2645,63 €
-Revenue: 9350,80 €
+Incomes: 12398,59 €  
+Penalties: 402,16 €  
+Energy: 2645,63 €  
+Revenue: 9350,80 €  
 ------------------------------------------------------------------------------------------------------------------
 
 ###Fault-tolerance for replicated applications
@@ -193,10 +193,10 @@ Such algorithm will reduce the cluster hosting capacity because it requires more
 
 ####Results
 
-Incomes:    12398,59€
-Penalties:  200,95€
-Energy:     2688,44€
-Revenue:    9509,21€
+Incomes:    12398,59€  
+Penalties:  200,95€  
+Energy:     2688,44€  
+Revenue:    9509,21€  
 
 ------------------------------------------------------------------------------------------------------------------
 ###Disaster recovery (flag `dr`)
@@ -206,10 +206,10 @@ Technical choices: We try to balance the VM in the buffer between the two schedu
 Temporal complexity: o(n) with n the number of host.
 
 ####Results
-Incomes: 12398.59€
-Penalties: 2223.24€
-Energy: 2649.07€
-Revenue:  7526.28€
+Incomes: 12398.59€  
+Penalties: 2223.24€  
+Energy: 2649.07€  
+Revenue:  7526.28€  
 ------------------------------------------------------------------------------------------------------------------
 ###Fault-tolerance for standalone VMs (flag `ft`)
 
@@ -221,10 +221,10 @@ How can we report the infrastructure load in that particular context ?
 Since we assign one VM out of ten on the most suitable host, we optimize the resources for some node which lead to reduce the energy consumption.
 
 ####Results
-Incomes: 12398.59€
-Penalties: 215.53€
-Energy:2644.49 €
-Revenue: 9538.57 €
+Incomes: 12398.59€  
+Penalties: 215.53€  
+Energy:2644.49 €  
+Revenue: 9538.57 €  
 
 ------------------------------------------------------------------------------------------------------------------
 ###Load balancing (flag `nextfit`)
@@ -235,10 +235,10 @@ Temporal complexity: o(nm) with n the number of hosts and m the number of VM.
 
 ####Results
 
-Incomes: 12398,59 €
-Penalties: 346,75 €
-Energy: 2715,76 €
-Revenue:  9336,07 €
+Incomes: 12398,59 €  
+Penalties: 346,75 €  
+Energy: 2715,76 €  
+Revenue:  9336,07 €  
 
 ------------------------------------------------------------------------------------------------------------------
 ###Load balancing (flag `worstfit`)
@@ -252,10 +252,10 @@ Worst-Fit scheduler algorithm perform the best 6.06€ against 346.75€. This i
 
 ####Results
 
-Incomes: 12398,59 €
-Penalties: 6,06 €
-Energy: 3285,97 €
-Revenue:  9106,56 €
+Incomes: 12398,59 €  
+Penalties: 6,06 €  
+Energy: 3285,97 €  
+Revenue:  9106,56 €  
 
 ------------------------------------------------------------------------------------------------------------------
 ###Performance satisfaction (flag `noViolations`)
@@ -266,10 +266,10 @@ Temporal complexity: Consequently o(pq) with p the number of hosts and q the num
 
 ####Results
 
-Incomes: 12398,59 €
-Penalties: 0,00 €
-Energy: 2868,74 €
-Revenue:  9529,85 €
+Incomes: 12398,59 €  
+Penalties: 0,00 €  
+Energy: 2868,74 €  
+Revenue:  9529,85 €  
 
 ------------------------------------------------------------------------------------------------------------------
 ###Energy-efficient (flag `energy`)
@@ -280,10 +280,10 @@ Temporal complexity: o(nlog(n)) with n the number of hosts.
 
 ####Results
 
-Incomes: 12398,59 €
-Penalties: 1413,50 €
-Energy: 2604,30 €
-Revenue:  8380,79 €
+Incomes: 12398,59 €  
+Penalties: 1413,50 €  
+Energy: 2604,30 €  
+Revenue:  8380,79 €  
 
 ------------------------------------------------------------------------------------------------------------------
 ###Greedy (flag `greedy`)
@@ -294,7 +294,7 @@ Temporal complexity: o(nlog(n)) with n the number of host if log(n) < number of 
 
 ####Results
 
-Incomes: 12398,59 €
-Penalties: 7,24 €
-Energy: 2754,93 €
-Revenue:  9636,42 €
+Incomes: 12398,59 €  
+Penalties: 7,24 €  
+Energy: 2754,93 €  
+Revenue:  9636,42 €  
