@@ -15,36 +15,58 @@ import java.util.Map;
 public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
 
     private Map<Vm, Host> hoster;
-    private Map<Integer, List<Host>> affinityMap;
+    private Map<Integer, List<Host>> TenMultipleMap;
 
     public FaultToleranceVmAllocationPolicy(List<? extends Host> list) {
+
         super(list);
+        hoster = new HashMap<>();
+        TenMultipleMap = new HashMap<Integer, List<Host>>();
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm) {
         //TODO
         int vmID = vm.getId();
-        if(vmID%10==0)
+        if(TenMultipleMap.containsKey(vmID%10) && vmID%10 == 0)
         {
             //check all eligible hosts for the class
-            for (Host h : affinityMap.get(vmID))
+            for (Host h : TenMultipleMap.get(vmID % 10))
             {
-
+                if(h.isFailed())
+                {
+                    for (Host host : getHostList())
+                    {
+                        if(!host.isFailed())
+                        {
+                            if (allocateHostForVm(vm, host))
+                                return true;
+                        }
+                    }
+                }
+                else
+                if (allocateHostForVm(vm, h))
+                    return true;
             }
         }
         else
         {
-
+            for (Host host : getHostList())
+            {
+                if (allocateHostForVm(vm, host))
+                    return true;
+            }
         }
         return false;
     }
 
     @Override
     public boolean allocateHostForVm(Vm vm, Host host) {
-     //Todo
-
-        return false;
+        if (host.vmCreate(vm)) {
+            hoster.put(vm, host);
+            return true;
+        } else
+            return false;
     }
 
     @Override
@@ -63,8 +85,6 @@ public class FaultToleranceVmAllocationPolicy extends VmAllocationPolicy {
 
     @Override
     public Host getHost(Vm vm) {
-
-        affinityMap.get(vm.getId()/100).add(vm.getHost());
         Host host = hoster.get(vm);
         return host;
     }
