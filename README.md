@@ -4,6 +4,8 @@ This project aims at developing different VM schedulers for a given IaaS cloud. 
 
 The implementation and the evaluation will be made over the IaaS cloud simulator [CloudSim](http://www.cloudbus.org/cloudsim/). The simulator will replay a workload extracted from Emulab, on a datacenter having realistic characteristics. 
 
+##The report is at the end of this document.
+
 #### Some usefull resources:
 
 - CloudSim [FAQ](https://code.google.com/p/cloudsim/wiki/FAQ#Policies_and_algorithms)
@@ -114,3 +116,185 @@ Develop a scheduler (`energy` flag) that reduces the overall energy consumption 
 ## Greedy scheduler
 
 Develop a scheduler that maximizes revenues. It is then important to provide a good trade-off between energy savings and penalties for SLA violation. Justify your choices and the theoretical complexity of the algorithm
+
+
+
+#Vicc report: homemade VM Schedulers
+
+This project aims at developing different VM schedulers for a given IaaS cloud. Each scheduler has meaningful properties for either the cloud customers or the cloud provider.
+
+The implementation and the evaluation were made over the IaaS cloud simulator CloudSim. The simulator replays a workload extracted from Emulab, on a datacenter having realistic characteristics.
+
+##Team
+Justin Vailhere : justin.vailhere@gmail.com
+Benoit Arliaud : arliaud.benoit@gmail.com
+Jiawen Fan : jiawen.gmd@gmail.com
+
+##Dev environment
+Java 8
+Maven
+IDE : Intellij IDEA
+Git
+
+To setup our environment , we first cloned the following directory directly in IntelliJ IDEA:
+```sh
+$ tree
+ |- src #the source code
+ |- repository #external dependencies
+ |- planetlab #the workload to process
+ |-cloudsim-3.0.3-src.tar.gz # simulator sources
+ \- pom.xml # maven project descriptor
+```
+Then we checked that everything was working by typing mvn install in the root directory.
+
+##Testing part
+`fr.unice.vicc.Main` is the entry point of our application. It can be launched from IntelliJ or using the command `mvn compile exec:java`.
+
+```sh
+Usage: Main scheduler [day]
+```
+
+- `scheduler` is the identifier of the scheduler to test, prefixed by `--`.
+- `day` is optional, it is one of the workload day (see folders in `planetlab`). When `all` is indicated all the days are replayed sequentially.
+
+By default, the output is written in a log file in the `logs` folder.
+
+If we execute the program through `mvn exec:java`, then the arguments are provided using the 'sched' and the 'day' properties.
+
+- To execute the simulator using the `naive` scheduler and all the days:
+`mvn compile exec:java -Dsched=naive -Dday=all`
+- to replay only day `20110303`: `mvn compile exec:java -Dsched=naive -Dday=20110303`
+
+##Exercises
+
+We developed 8 VM schedulers and use observers to monitor their behaviors.
+The class `VmAllocationPolicyFactory` is the entry point to declare our schedulers and integrate them within the codebase.
+
+###Naive scheduler (flag `naive`)
+Role: This first scheduler is the most basic, it just distribute VM on hosts until they are full, then it goes to the next host. 
+Technical choices: We use the method vmCreate of the class Host to test if there is enough memory and cpu. Then we put each vm assign to a host in the hash map hoster.
+Temporal complexity: o(n) where n is the number of host.
+
+####Results
+Incomes: 12398,59 €
+Penalties: 402,16 €
+Energy: 2645,63 €
+Revenue: 9350,80 €
+------------------------------------------------------------------------------------------------------------------
+
+###Fault-tolerance for replicated applications
+Role: This scheduler aims to prevent failure from a node by replicating VM on distinct nodes and never lose a VM.
+Technical choices: We add a variable in the class which is a hashmap. It contains an integer associated with a list of host. These hosts contain all the vm which have the same range id of the input (which own the same hundred of id : 0-99).
+Temporal complexity: o(n) where n is the number of host concerned in the hash map.
+
+What is the impact of such an algorithm over the cluster hosting capacity ? Why ?
+
+Such algorithm will reduce the cluster hosting capacity because it requires more resources in memory and more cpu (additional constraint), since the VMs run replicated applications on distinct hosts.
+
+####Results
+
+Incomes:    12398,59€
+Penalties:  200,95€
+Energy:     2688,44€
+Revenue:    9509,21€
+
+------------------------------------------------------------------------------------------------------------------
+###Disaster recovery (flag `dr`)
+
+Role: The aim is to prevent failure which came from the switch. If the hosts are connected with at least 2 switch, then it could stand a failure switch. It must provide an organization with a way to recover data or implement failover in the event of a man-made or natural catastrophe.
+Technical choices: We try to balance the VM in the buffer between the two scheduler, the VM will be alternatively allocate between the first and the second switch.
+Temporal complexity: o(n) with n the number of host.
+
+####Results
+Incomes: 12398.59€
+Penalties: 2223.24€
+Energy: 2649.07€
+Revenue:  7526.28€
+------------------------------------------------------------------------------------------------------------------
+###Fault-tolerance for standalone VMs (flag `ft`)
+
+Role: When a failure happens on a node, this scheduler restart all the vm of this node on the remaining nodes. Although no VM are replicated, it is fault tolerance but in a different way. 
+Technical choices: We test if the id of the VM end by zero and if the host is suitable for the VM and put it in the host. Otherwise we just put it in a host as soon as possible.
+Temporal complexity: o(n) with n the number of host.
+
+How can we report the infrastructure load in that particular context ?
+Since we assign one VM out of ten on the most suitable host, we optimize the resources for some node which lead to reduce the energy consumption.
+
+####Results
+Incomes: 12398.59€
+Penalties: 215.53€
+Energy:2644.49 €
+Revenue: 9538.57 €
+
+------------------------------------------------------------------------------------------------------------------
+###Load balancing (flag `nextfit`)
+
+Role: Avoid to alter specific hosts prematurely. It is also convenient to minimize the probability of saturating a host. It allows cloud computing to "scale up to increasing demands" by efficiently allocating dynamic local workload evenly across all nodes. This algorithm is an evolution of the First Fit algorithm  except that we start searching from where it left off and not from the beginning. The advantage of the algorithm it’s the fastest one as it searches as little as possible. But there is a loss of unused memory.
+Technical choices: next fit algorithm / worst fit algorithm
+Temporal complexity: o(nm) with n the number of hosts and m the number of VM.
+
+####Results
+
+Incomes: 12398,59 €
+Penalties: 346,75 €
+Energy: 2715,76 €
+Revenue:  9336,07 €
+
+------------------------------------------------------------------------------------------------------------------
+###Load balancing (flag `worstfit`)
+
+Role: The approach here is to locate available free portion that are large enough to be still useful after putting the VM. The advantage is it reduces the production of small gap. But at later stage it will require larger  memory.
+Technical choices: We sort the hosts by the availability of MIPS. Then we take the first one of this list (the one with the greater resources available) and put the VM inside.
+Temporal complexity:o(nm) with n the number of hosts and m the number of VM.have sorted
+
+Which algorithms performs the best in terms of reducing the SLA violation Why ?
+Worst-Fit scheduler algorithm perform the best 6.06€ against 346.75€. This is because in the Worst-Fit algorithm, the host are sorted by resources available. As a result the VM are always running on hosts with a lot of MIPS available and reduce the SLA violation.
+
+####Results
+
+Incomes: 12398,59 €
+Penalties: 6,06 €
+Energy: 3285,97 €
+Revenue:  9106,56 €
+
+------------------------------------------------------------------------------------------------------------------
+###Performance satisfaction (flag `noViolations`)
+
+Role: This scheduler is made for respecting the SLA violation which bring penalties for the provider. Then it never provide under a threshold of MIPS. As a result it leads to get no penalties.
+Technical choices: We made two loop, one for the host and inside another one for the cores of CPU. Then we test if the host can provide enough MIPS compared to the VM need otherwise we search another host. When we found one we attribute the VM to that host.
+Temporal complexity: Consequently o(pq) with p the number of hosts and q the number of cores of CPU in each host.
+
+####Results
+
+Incomes: 12398,59 €
+Penalties: 0,00 €
+Energy: 2868,74 €
+Revenue:  9529,85 €
+
+------------------------------------------------------------------------------------------------------------------
+###Energy-efficient (flag `energy`)
+
+Role: This Scheduler aim to reduce as much as possible the number of node without proceed to VM migration and it lead to reduce the energy consumption.
+Technical choices: We choose to sort the list of host by the available MIPS. Then we do a loop over this list and assign the first VM to the host with the greatest MIPS available. At the end it contribute to reduce the number of host where a VM is running and then reduce the energy cost.
+Temporal complexity: o(nlog(n)) with n the number of hosts.
+
+####Results
+
+Incomes: 12398,59 €
+Penalties: 1413,50 €
+Energy: 2604,30 €
+Revenue:  8380,79 €
+
+------------------------------------------------------------------------------------------------------------------
+###Greedy (flag `greedy`)
+
+Role: The aim is to maximize the benefit and it leads find the best trade-off between first reduce the consumption energy and secondly reduce the costs from SLA violation. 
+Technical choices: We start from the code of SLA violation as it was the most profitable algorithm. Then we mix it with the energies scheduler to try to reduce the cost of energy without increasing a lot the penalties.We found the margin of 500 MIPS by testing quite a lot of value (no theory found why this value is the best). To do so we sort the machine by the MIPS available.
+Temporal complexity: o(nlog(n)) with n the number of host if log(n) < number of cores of CPU per host.
+
+####Results
+
+Incomes: 12398,59 €
+Penalties: 7,24 €
+Energy: 2754,93 €
+Revenue:  9636,42 €
